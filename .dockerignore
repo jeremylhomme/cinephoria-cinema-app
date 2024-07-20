@@ -1,0 +1,57 @@
+# Exclude node_modules and logs
+node_modules
+web-app/node_modules
+mobile-app/node_modules
+desktop-app/node_modules
+*.log
+npm-debug.log*
+web-app/npm-debug.log*
+
+# Exclude local environment files
+.env
+.env.*
+web-app/.env
+web-app/.env.*
+web-app/cypress.env.json
+web-app/frontend/.env
+web-app/frontend/.env.*
+mobile-app/.env
+mobile-app/.env.*
+desktop-app/.env
+desktop-app/.env.*
+
+# Exclude version control files and directories
+.git
+.gitignore
+.DS_Store
+
+# data
+web-app/frontend/src/assets/data
+
+# Exclude development and IDE files
+.vscode/
+.idea/
+**/README.md
+**/LICENSE
+
+# Exclude unnecessary directories and files
+coverage/
+dist/
+web-app/coverage/
+web-app/dist/
+sql_code/
+auth_scripts/
+
+# Exclude frontend build files
+web-app/frontend/.eslintrc.cjs
+web-app/frontend/postcss.config.js
+web-app/frontend/tailwind.config.js
+web-app/frontend/vite.config.js
+
+# Exclude Cypress files
+web-app/cypress/screenshots/
+web-app/cypress/downloads/
+web-app/cypress/videos/
+
+# Exclude desktop build files
+desktop-app/.vite/build

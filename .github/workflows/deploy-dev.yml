@@ -1,0 +1,90 @@
+name: Development Branch CI
+
+on:
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Start Docker containers
+        run: npm run docker:test
+        working-directory: ./web-app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_NAME: mongo_cinephoria_dev
+          MONGODB_HOST: mongodb-db
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          MONGODB_USERNAME: root
+          MONGODB_PORT: 27017
+          MYSQL_DB_NAME: sql_cinephoria_dev
+          MYSQL_HOST: mysql-db
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_USER: root
+          MYSQL_PORT: 3306
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+
+      - name: Check for test files
+        id: check_tests
+        run: |
+          if [ -n "$(find tests/unit -name '*.test.js' -or -name '*.spec.js')" ]; then
+            echo "unit_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "unit_tests=false" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "$(find tests/functional -name '*.test.js' -or -name '*.spec.js')" ]; then
+            echo "functional_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "functional_tests=false" >> $GITHUB_OUTPUT
+          fi
+          if [ -n "$(find tests/integration -name '*.test.js' -or -name '*.spec.js')" ]; then
+            echo "integration_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "integration_tests=false" >> $GITHUB_OUTPUT
+          fi
+        working-directory: ./web-app
+
+      - name: Run unit tests
+        if: steps.check_tests.outputs.unit_tests == 'true'
+        run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:unit
+        working-directory: ./web-app
+        env:
+          DATABASE_URL: mysql://root:${{ secrets.MYSQL_PASSWORD }}@mysql-db:3306/sql_cinephoria_dev
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: Run functional tests
+        if: steps.check_tests.outputs.functional_tests == 'true'
+        run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:functional
+        working-directory: ./web-app
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: Run integration tests
+        if: steps.check_tests.outputs.integration_tests == 'true'
+        run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:integration
+        working-directory: ./web-app
+        env:
+          DATABASE_URL: mysql://root:${{ secrets.MYSQL_PASSWORD }}@mysql-db:3306/sql_cinephoria_dev
+          MONGODB_NAME: mongo_cinephoria_dev
+          MONGODB_HOST: mongodb-db
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          MONGODB_USERNAME: root
+          MONGODB_PORT: 27017
+          MYSQL_DB_NAME: sql_cinephoria_dev
+          MYSQL_HOST: mysql-db
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_USER: root
+          MYSQL_PORT: 3306
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
