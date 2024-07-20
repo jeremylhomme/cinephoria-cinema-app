@@ -46,6 +46,9 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
+      - MAILGUN_CINEPHORIA_API_KEY=${MAILGUN_CINEPHORIA_API_KEY}
     networks:
       - cinephoria-network
     command: sh -c "until nc -z mysql-db 3306; do echo 'Waiting for MySQL...'; sleep 1; done; echo 'MySQL is up - running Prisma migrate and generate'; npx prisma migrate deploy; npx prisma generate; npm run backend:docker:test"

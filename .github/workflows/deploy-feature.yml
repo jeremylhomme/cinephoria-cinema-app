@@ -32,6 +32,9 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+          MAILGUN_CINEPHORIA_API_KEY: ${{ secrets.MAILGUN_CINEPHORIA_API_KEY }}
 
       - name: Check for test files
         id: check_tests
