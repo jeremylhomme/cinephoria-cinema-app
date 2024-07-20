@@ -11,8 +11,19 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+import bookingRoutes from "./routes/bookingRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import cinemaRoutes from "./routes/cinemaRoutes.js";
+import incidentRoutes from "./routes/incidentRoutes.js";
+import movieRoutes from "./routes/movieRoutes.js";
+import roomRoutes from "./routes/roomRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
+import seatRoutes from "./routes/seatRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import verificationRoutes from "./routes/verificationRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+
+import { sendContactForm } from "./controllers/userController.js";
 
 // Initialize Stripe
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
@@ -105,8 +116,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Routes
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/cinemas", cinemaRoutes);
+app.use("/api/incidents", incidentRoutes);
+app.use("/api/movies", movieRoutes);
+app.use("/api/rooms", roomRoutes);
+app.use("/api/sessions", sessionRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/verify-email", verificationRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/seats", seatRoutes);
+app.post("/api/contact", sendContactForm);
 
 // Add Stripe payment route
 app.post("/create-payment-intent", async (req, res) => {
