@@ -11,6 +11,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+import userRoutes from "./routes/userRoutes.js";
+import verificationRoutes from "./routes/verificationRoutes.js";
+
 // Initialize Stripe
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 console.log(`Stripe Initialized ✅`);
@@ -100,6 +103,10 @@ app.use(cors(corsOptionsDelegate));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Routes
+app.use("/api/users", userRoutes);
+app.use("/api/verify-email", verificationRoutes);
 
 // Add Stripe payment route
 app.post("/create-payment-intent", async (req, res) => {

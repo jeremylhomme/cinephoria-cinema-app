@@ -1,20 +1,25 @@
-# Use an official Node runtime as the base image
-FROM node:20-alpine
+# Use an official Node runtime as the base image (Debian-based)
+FROM node:20-bullseye-slim
 
 # Set the working directory in the container to /usr/src/app
 WORKDIR /usr/src/app
 
 # Install necessary packages
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     netcat-openbsd \
-    bash \
     xvfb \
-    chromium \
-    harfbuzz \
-    nss \
-    freetype \
-    ttf-freefont \
-    libc6-compat
+    libgtk2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libnotify-dev \
+    libgconf-2-4 \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    xauth \
+    xvfb \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
