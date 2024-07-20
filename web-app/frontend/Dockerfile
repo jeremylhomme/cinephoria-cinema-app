@@ -1,18 +1,32 @@
-# Build react client
-FROM node:20-alpine
+# Build stage
+FROM node:20-alpine as build
 
-# Working directory be app
+# Set working directory
 WORKDIR /usr/src/app
 
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-###  Installing dependencies
+# Install dependencies
+RUN npm ci --silent
 
-RUN npm install --silent
-
-# copy local files to app folder
+# Copy all files
 COPY . .
 
-EXPOSE 3000
+# Build the app
+RUN npm run build
 
-CMD ["npm","start"]
+# Production stage
+FROM nginx:alpine
+
+# Copy built assets from build stage
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
+# Add your nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
