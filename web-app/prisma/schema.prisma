@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                        Int       @id @default(autoincrement())
+  userFirstName             String
+  userLastName              String
+  userUserName              String?   @unique
+  userPassword              String
+  userEmail                 String    @unique
+  userRole                  Role      @default(customer)
+  userCreatedAt             DateTime  @default(now())
+  userUpdatedAt             DateTime  @updatedAt
+  mustChangePassword        Boolean   @default(false)
+  isVerified                Boolean   @default(false)
+  verificationCode          String?   @unique
+  verificationCodeExpires   DateTime?
+  resetToken                String?
+  resetTokenExpires         DateTime?
+  agreedPolicy              Boolean   @default(false)
+  agreedCgvCgu              Boolean   @default(false)
+} 
+
+
+enum Role {
+  admin
+  employee
+  customer
+}
+
+model Category {
+  id                        Int     @id @default(autoincrement())
+  categoryName              String  @unique
+  movies                    Movie[] @relation("MovieToCategory")
+}
+
+model Movie {
+  id                        Int       @id @default(autoincrement())
+  movieDescription          String
+  movieReleaseDate          DateTime
+  movieTrailerUrl           String
+  movieTitle                String    @unique
+  movieLength               Int
+  movieImg                  String
+  moviePublishingState      PublishingState @default(active)
+  movieFavorite             Boolean   @default(false)
+  movieMinimumAge           Int       @default(0)
+  movieCreatedAt            DateTime  @default(now())
+  movieUpdatedAt            DateTime  @updatedAt
+  movieScheduleDate         DateTime?
+  moviePremiereDate         DateTime?
+  movieAverageRating        Float?    @default(0)
+  categories                Category[] @relation("MovieToCategory")
+  sessions                  Session[]
+}
+
+enum PublishingState {
+  premiere
+  active
+  inactive
+}
+
+model Cinema {
+  id                        Int       @id @default(autoincrement())
+  cinemaName                String    @unique
+  cinemaEmail               String    @unique
+  cinemaAddress             String
+  cinemaPostalCode          String
+  cinemaCity                String
+  cinemaCountry             String
+  cinemaTelNumber           String
+  cinemaStartTimeOpening    String
+  cinemaEndTimeOpening      String
+  sessions                  Session[]
+  rooms                     Room[]
+}
+
+model Room {
+  id                        Int         @id @default(autoincrement())
+  cinemaId                  Int
+  roomNumber                Int
+  roomCapacity              Int
+  roomQuality               String
+  roomDeletedAt             DateTime?   @map("deleted_at")
+  cinema                    Cinema      @relation(fields: [cinemaId], references: [id])
+  sessions                  Session[]   
+  seats                     Seat[]
+  seatMapId                 String      @default(uuid())
+}
+
+model Seat {
+  id                        Int         @id @default(autoincrement())
+  seatNumber                String
+  pmrSeat                   Boolean     @default(false)
+  roomId                    Int
+  room                      Room        @relation(fields: [roomId], references: [id])
+  seatStatuses              SeatStatus[]
+}
+
+model Session {
+  id                        Int           @id @default(autoincrement())
+  movieId                   Int
+  cinemaId                  Int
+  roomId                    Int
+  sessionDate               DateTime
+  sessionPrice              Float
+  sessionStatus             SessionStatus @default(active)
+  movie                     Movie         @relation(fields: [movieId], references: [id])
+  room                      Room          @relation(fields: [roomId], references: [id])
+  cinema                    Cinema        @relation(fields: [cinemaId], references: [id])
+  timeRanges                TimeRange[]
+  deletedAt                 DateTime?
+}
+
+enum SessionStatus {
+  active
+  ended
+  deleted
+}
+
+model TimeRange {
+  id                        Int             @id @default(autoincrement())
+  timeRangeStartTime        DateTime
+  timeRangeEndTime          DateTime
+  sessionId                 Int
+  timeRangeStatus           TimeRangeStatus @default(available)
+  session                   Session         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  seatStatuses              SeatStatus[]
+  @@unique([timeRangeStartTime, timeRangeEndTime, sessionId])
+}
+
+enum TimeRangeStatus {
+  available
+  booking
+  booked
+}
+
+model SeatStatus {
+  id                        Int          @id @default(autoincrement())
+  seatId                    Int
+  timeRangeId               Int
+  status                    SeatStatusEnum
+  seat                      Seat         @relation(fields: [seatId], references: [id])
+  timeRange                 TimeRange    @relation(fields: [timeRangeId], references: [id], onDelete: Cascade)
+  @@unique([seatId, timeRangeId])
+}
+
+enum SeatStatusEnum {
+  available
+  pending
+  booked
+}
