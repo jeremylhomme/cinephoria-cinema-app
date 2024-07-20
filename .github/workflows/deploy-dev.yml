@@ -56,6 +56,12 @@ jobs:
           fi
         working-directory: ./web-app
 
+      - name: Apply Prisma Schema
+        run: docker-compose -f docker-compose-test.yml exec -T backend npx prisma db push --force-reset
+        working-directory: ./web-app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Run unit tests
         if: steps.check_tests.outputs.unit_tests == 'true'
         run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:unit
