@@ -6,16 +6,17 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     image: app-frontend
-    command: npm start
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
-      - "5174:5173"
+      - "5173:80"
     depends_on:
       - backend
     networks:
       - cinephoria-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -46,9 +47,12 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
+      - MAILGUN_CINEPHORIA_API_KEY=${MAILGUN_CINEPHORIA_API_KEY}
     networks:
       - cinephoria-network
-    command: sh -c "until nc -z mysql-db 3306; do echo 'Waiting for MySQL...'; sleep 1; done; echo 'MySQL is up - running Prisma migrate and generate'; npx prisma migrate deploy; npx prisma generate; npm run backend:docker:test"
+    command: sh -c "until nc -z mysql-db 3306; do echo 'Waiting for MySQL...'; sleep 1; done; echo 'MySQL is up - running Prisma db push'; npx prisma db push --force-reset; npm run backend:docker:test"
 
   mysql-db:
     image: mysql:5.7

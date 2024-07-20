@@ -32,6 +32,9 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+          MAILGUN_CINEPHORIA_API_KEY: ${{ secrets.MAILGUN_CINEPHORIA_API_KEY }}
 
       - name: Check for test files
         id: check_tests
@@ -52,6 +55,12 @@ jobs:
             echo "integration_tests=false" >> $GITHUB_OUTPUT
           fi
         working-directory: ./web-app
+
+      - name: Apply Prisma Schema
+        run: docker-compose -f docker-compose-test.yml exec -T backend npx prisma db push --force-reset
+        working-directory: ./web-app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run unit tests
         if: steps.check_tests.outputs.unit_tests == 'true'
