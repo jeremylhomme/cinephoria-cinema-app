@@ -1,0 +1,87 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: app-frontend
+    command: npm start
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "5174:5173"
+    depends_on:
+      - backend
+    networks:
+      - cinephoria-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app-backend
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql-db
+      - mongodb-db
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MONGODB_NAME=${MONGODB_NAME}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_URI=${MONGODB_URI}
+      - MYSQL_DB_NAME=${MYSQL_DB_NAME}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - cinephoria-network
+    command: sh -c "until nc -z mysql-db 3306; do echo 'Waiting for MySQL...'; sleep 1; done; echo 'MySQL is up - running Prisma migrate and generate'; npx prisma migrate deploy; npx prisma generate; npm run backend:docker:dev"
+
+  mysql-db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB_NAME}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - cinephoria-network
+
+  mongodb-db:
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - cinephoria-network
+
+networks:
+  cinephoria-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongo-data:
