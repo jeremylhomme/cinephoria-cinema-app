@@ -51,7 +51,7 @@ services:
       - MAILGUN_CINEPHORIA_API_KEY=${MAILGUN_CINEPHORIA_API_KEY}
     networks:
       - cinephoria-network
-    command: sh -c "until nc -z mysql-db 3306; do echo 'Waiting for MySQL...'; sleep 1; done; echo 'MySQL is up - running Prisma migrate and generate'; npx prisma migrate deploy; npx prisma generate; npm run backend:docker:test"
+    command: sh -c "until nc -z mysql-db 3306; do echo 'Waiting for MySQL...'; sleep 1; done; echo 'MySQL is up - running Prisma db push'; npx prisma db push --force-reset; npm run backend:docker:test"
 
   mysql-db:
     image: mysql:5.7
