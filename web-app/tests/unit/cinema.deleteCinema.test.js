@@ -1,0 +1,87 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { deleteCinema } from "../../backend/controllers/cinemaController.js";
+
+// Mock Prisma
+const mockPrisma = {
+  cinema: {
+    findUnique: vi.fn(),
+    delete: vi.fn(),
+  },
+};
+
+describe("Cinema Controllers", () => {
+  let mockReq, mockRes;
+
+  beforeEach(() => {
+    mockReq = { params: {}, query: {}, body: {} };
+    mockRes = {
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
+    };
+    vi.clearAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    console.error.mockRestore();
+  });
+
+  describe("deleteCinema", () => {
+    it("should delete a cinema", async () => {
+      mockReq.params.id = "1";
+      mockPrisma.cinema.findUnique.mockResolvedValue({
+        id: 1,
+        cinemaName: "Cinema to Delete",
+      });
+      mockPrisma.cinema.delete.mockResolvedValue({
+        id: 1,
+        cinemaName: "Cinema to Delete",
+      });
+
+      await deleteCinema(mockReq, mockRes, mockPrisma);
+
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: "Cinema deleted successfully",
+      });
+    });
+
+    it("should return 404 if cinema not found", async () => {
+      mockReq.params.id = "999";
+      mockPrisma.cinema.findUnique.mockResolvedValue(null);
+
+      await deleteCinema(mockReq, mockRes, mockPrisma);
+
+      expect(mockRes.status).toHaveBeenCalledWith(404);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: "Cinema not found",
+      });
+    });
+
+    it("should return 400 if cinema ID is missing", async () => {
+      await deleteCinema(mockReq, mockRes, mockPrisma);
+
+      expect(mockRes.status).toHaveBeenCalledWith(400);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: "Cinema ID is required",
+      });
+    });
+
+    it("should handle errors", async () => {
+      mockReq.params.id = "1";
+      mockPrisma.cinema.findUnique.mockResolvedValue({
+        id: 1,
+        cinemaName: "Cinema to Delete",
+      });
+      mockPrisma.cinema.delete.mockRejectedValue(new Error("Database error"));
+
+      await deleteCinema(mockReq, mockRes, mockPrisma);
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: "Server error",
+        error: "Database error",
+      });
+    });
+  });
+});
