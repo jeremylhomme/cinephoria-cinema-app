@@ -6,16 +6,17 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     image: app-frontend
-    command: npm start
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
-      - "5174:5173"
+      - "5173:80"
     depends_on:
       - backend
     networks:
       - cinephoria-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
