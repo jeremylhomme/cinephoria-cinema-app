@@ -35,7 +35,12 @@ vi.mock("../../backend/middlewares/authMiddleware", async (importOriginal) => {
           userFirstName: "Test",
           userLastName: "User",
           userEmail: "test@example.com",
-          userRole: token === "ADMIN_TOKEN" ? "admin" : "customer",
+          userRole:
+            token === "ADMIN_TOKEN"
+              ? "admin"
+              : token === "SUPERADMIN_TOKEN"
+              ? "superadmin"
+              : "customer",
         };
         next();
       } else if (req.cookies.jwt) {
@@ -52,10 +57,20 @@ vi.mock("../../backend/middlewares/authMiddleware", async (importOriginal) => {
       }
     },
     authorizedAdmin: (req, res, next) => {
-      if (req.user && req.user.userRole === "admin") {
+      if (
+        req.user &&
+        (req.user.userRole === "admin" || req.user.userRole === "superadmin")
+      ) {
         next();
       } else {
         res.status(403).json({ error: "Not authorized as an admin" });
+      }
+    },
+    authorizedSuperAdmin: (req, res, next) => {
+      if (req.user && req.user.userRole === "superadmin") {
+        next();
+      } else {
+        res.status(403).json({ error: "Not authorized as a superadmin" });
       }
     },
   };
@@ -166,6 +181,117 @@ describe("User Controller", () => {
         "error",
         "Not authorized, no token provided."
       );
+    });
+  });
+
+  describe("DELETE /api/users/:id", () => {
+    it("should delete a regular user", async () => {
+      const regularUser = await prisma.user.create({
+        data: {
+          userFirstName: "Regular",
+          userLastName: "User",
+          userEmail: "regular@example.com",
+          userUserName: "regularuser",
+          userPassword: await hashPassword("Password123!"),
+          userRole: "customer",
+        },
+      });
+
+      const response = await request(app)
+        .delete(`/api/users/${regularUser.id}`)
+        .set("Authorization", "Bearer ADMIN_TOKEN");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty(
+        "message",
+        "User deleted successfully."
+      );
+
+      const deletedUser = await prisma.user.findUnique({
+        where: { id: regularUser.id },
+      });
+      expect(deletedUser).toBeNull();
+    });
+
+    it("should not allow deleting a superadmin", async () => {
+      const superadmin = await prisma.user.create({
+        data: {
+          userFirstName: "Super",
+          userLastName: "Admin",
+          userEmail: "superadmin@example.com",
+          userUserName: "superadmin",
+          userPassword: await hashPassword("Password123!"),
+          userRole: "superadmin",
+        },
+      });
+
+      const response = await request(app)
+        .delete(`/api/users/${superadmin.id}`)
+        .set("Authorization", "Bearer ADMIN_TOKEN");
+
+      expect(response.status).toBe(403);
+      expect(response.body).toHaveProperty(
+        "message",
+        "Superadmin cannot be deleted"
+      );
+
+      const superadminStillExists = await prisma.user.findUnique({
+        where: { id: superadmin.id },
+      });
+      expect(superadminStillExists).not.toBeNull();
+    });
+
+    it("should not allow non-admins to delete users", async () => {
+      const userToDelete = await prisma.user.create({
+        data: {
+          userFirstName: "To",
+          userLastName: "Delete",
+          userEmail: "todelete@example.com",
+          userUserName: "todelete",
+          userPassword: await hashPassword("Password123!"),
+          userRole: "customer",
+        },
+      });
+
+      const response = await request(app)
+        .delete(`/api/users/${userToDelete.id}`)
+        .set("Authorization", "Bearer CUSTOMER_TOKEN");
+
+      expect(response.status).toBe(403);
+      expect(response.body).toHaveProperty(
+        "error",
+        "Not authorized as an admin"
+      );
+
+      const userStillExists = await prisma.user.findUnique({
+        where: { id: userToDelete.id },
+      });
+      expect(userStillExists).not.toBeNull();
+    });
+  });
+
+  describe("Superadmin Privileges", () => {
+    it("should allow superadmin to access admin routes", async () => {
+      const response = await request(app)
+        .get("/api/users")
+        .set("Authorization", "Bearer SUPERADMIN_TOKEN");
+
+      expect(response.status).toBe(200);
+    });
+
+    it("should allow only superadmin to access superadmin-only routes", async () => {
+      // Assuming you have a superadmin-only route, e.g., /api/superadmin/dashboard
+      const superadminResponse = await request(app)
+        .get("/api/superadmin/dashboard")
+        .set("Authorization", "Bearer SUPERADMIN_TOKEN");
+
+      expect(superadminResponse.status).toBe(200);
+
+      const adminResponse = await request(app)
+        .get("/api/superadmin/dashboard")
+        .set("Authorization", "Bearer ADMIN_TOKEN");
+
+      expect(adminResponse.status).toBe(403);
     });
   });
 
