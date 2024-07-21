@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: cinephoria-frontend
+    env: node
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: VITE_API_URL
+
+  - type: web
+    name: cinephoria-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run prod
+    envVars:
+      - key: PORT
+      - key: MONGODB_URI
+      - key: DATABASE_URL
+      - key: JWT_SECRET
+      - key: MYSQL_HOST
+      - key: MYSQL_DB
+      - key: MYSQL_PASSWORD
+      - key: MYSQL_USER
+      - key: STRIPE_SECRET_KEY
+      - key: WEB_APP_FRONTEND_URL
