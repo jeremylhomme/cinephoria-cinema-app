@@ -79,7 +79,7 @@ const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/lost-password" element={<LostPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/verify-email/:code" element={<VerifyEmail />} />
       <Route index element={<Home />} />
       <Route path="/movies" element={<Movies />} />
       <Route path="/movies/:movieId" element={<MoviePage />} />

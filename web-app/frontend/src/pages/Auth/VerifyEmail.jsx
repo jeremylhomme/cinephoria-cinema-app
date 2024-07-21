@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Loader from "../../components/Loader";
 import { useVerifyEmailMutation } from "../../redux/api/userApiSlice";
 
 const VerifyEmail = () => {
+  const { code } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const code = queryParams.get("code") || "";
-
   const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
   const [message, setMessage] = useState("");
   const [verificationAttempted, setVerificationAttempted] = useState(false);
