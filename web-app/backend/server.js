@@ -86,31 +86,18 @@ const connectMongoDB = async () => {
 const app = express();
 const port = process.env.PORT;
 
-const corsOptionsDelegate = function (req, callback) {
-  const allowedOrigins = [
+const corsOptions = {
+  origin: [
     process.env.WEB_APP_FRONTEND_URL,
+    "https://cinephoria-frontend.onrender.com",
     "http://localhost:5173",
     "http://localhost:5174",
-    "http://localhost:8081",
-  ];
-
-  const origin = req.header("Origin");
-  let corsOptions;
-
-  if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-    corsOptions = {
-      origin: true,
-      optionsSuccessStatus: 200,
-      credentials: true,
-    };
-  } else {
-    corsOptions = { origin: false };
-  }
-
-  callback(null, corsOptions);
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
 };
 
-app.use(cors(corsOptionsDelegate));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

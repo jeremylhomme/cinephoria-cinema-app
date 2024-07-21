@@ -21,16 +21,5 @@ export default defineConfig(({ mode }) => {
     define: {
       "process.env": env,
     },
-    server: {
-      port: 5173,
-      host: true,
-      proxy: {
-        "/api": {
-          target: env.VITE_API_URL || "http://localhost:5000",
-          changeOrigin: true,
-          secure: false,
-        },
-      },
-    },
   };
 });

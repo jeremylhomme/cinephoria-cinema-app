@@ -714,6 +714,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 const verifyEmail = asyncHandler(async (req, res) => {
   const { code } = req.params;
+  console.log("Received verification code:", code);
 
   const user = await prisma.user.findFirst({
     where: {
