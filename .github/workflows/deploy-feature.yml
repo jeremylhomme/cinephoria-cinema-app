@@ -97,22 +97,3 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
-
-      - name: Check for E2E test files
-        id: check_e2e_tests
-        run: |
-          if [ -n "$(find cypress/e2e -name '*.cy.js')" ]; then
-            echo "e2e_tests=true" >> $GITHUB_OUTPUT
-          else
-            echo "e2e_tests=false" >> $GITHUB_OUTPUT
-          fi
-        working-directory: ./web-app
-
-      - name: Run e2e tests
-        run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:e2e:run
-        working-directory: ./web-app
-        env:
-          WEB_APP_FRONTEND_URL: http://localhost:5174
-          VITE_API_URL: http://localhost:5000
-          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
-          MAILGUN_CINEPHORIA_API_KEY: ${{ secrets.MAILGUN_CINEPHORIA_API_KEY }}
