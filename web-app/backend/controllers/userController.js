@@ -197,7 +197,22 @@ const registerUser = asyncHandler(async (req, res, prisma) => {
 });
 
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      userFirstName: true,
+      userLastName: true,
+      userUserName: true,
+      userEmail: true,
+      userRole: true,
+      userCreatedAt: true,
+      userUpdatedAt: true,
+      mustChangePassword: true,
+      isVerified: true,
+      agreedPolicy: true,
+      agreedCgvCgu: true,
+    },
+  });
   res.json(users);
 });
 

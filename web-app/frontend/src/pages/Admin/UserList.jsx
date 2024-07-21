@@ -398,6 +398,8 @@ const UserList = () => {
                                     <div className="font-medium">
                                       {user.userRole === "admin"
                                         ? "Administrateur"
+                                        : user.userRole === "superadmin"
+                                        ? "Super Admin"
                                         : user.userRole === "employee"
                                         ? "Employé"
                                         : user.userRole === "customer"
