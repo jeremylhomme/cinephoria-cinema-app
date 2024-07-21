@@ -8,6 +8,7 @@ import { sendEmail } from "../backend/utils/sendEmail.js";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs/promises";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +16,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const prisma = new PrismaClient();
+
+// Update the path to the data files
+const dataPath = path.resolve(__dirname, "../frontend/src/assets/data");
 
 async function createAdminUser() {
   const userFirstName = process.env.ADMIN_FIRST_NAME;
@@ -93,8 +97,96 @@ async function createAdminUser() {
   }
 }
 
+async function createCategories() {
+  const categoriesData = JSON.parse(
+    await fs.readFile(path.join(dataPath, "categoryData.json"), "utf8")
+  );
+
+  for (const category of categoriesData) {
+    const existingCategory = await prisma.category.findUnique({
+      where: { categoryName: category.categoryName },
+    });
+
+    if (!existingCategory) {
+      await prisma.category.create({ data: category });
+      console.log(`Created category: ${category.categoryName}`);
+    } else {
+      console.log(`Category already exists: ${category.categoryName}`);
+    }
+  }
+}
+
+async function createMovies() {
+  const moviesData = JSON.parse(
+    await fs.readFile(path.join(dataPath, "movieData.json"), "utf8")
+  );
+
+  for (const movie of moviesData) {
+    const existingMovie = await prisma.movie.findUnique({
+      where: { movieTitle: movie.movieTitle },
+    });
+
+    if (!existingMovie) {
+      const { categoryIds, ...movieData } = movie;
+      const createdMovie = await prisma.movie.create({
+        data: {
+          ...movieData,
+          movieReleaseDate: new Date(movie.movieReleaseDate),
+          movieScheduleDate: movie.movieScheduleDate
+            ? new Date(movie.movieScheduleDate)
+            : undefined,
+          moviePremiereDate: movie.moviePremiereDate
+            ? new Date(movie.moviePremiereDate)
+            : undefined,
+          categories: {
+            connect: categoryIds.map((id) => ({ id })),
+          },
+        },
+      });
+      console.log(`Created movie: ${createdMovie.movieTitle}`);
+    } else {
+      console.log(`Movie already exists: ${movie.movieTitle}`);
+    }
+  }
+}
+
+async function createCinemas() {
+  const cinemasData = JSON.parse(
+    await fs.readFile(path.join(dataPath, "cinemaData.json"), "utf8")
+  );
+
+  for (const cinema of cinemasData) {
+    const existingCinema = await prisma.cinema.findFirst({
+      where: {
+        OR: [
+          { cinemaName: cinema.cinemaName },
+          { cinemaEmail: cinema.cinemaEmail },
+        ],
+      },
+    });
+
+    if (!existingCinema) {
+      const createdCinema = await prisma.cinema.create({
+        data: cinema,
+      });
+      console.log(`Created cinema: ${createdCinema.cinemaName}`);
+    } else {
+      console.log(`Cinema already exists: ${cinema.cinemaName}`);
+    }
+  }
+}
+
 async function main() {
-  await createAdminUser();
+  try {
+    await createAdminUser();
+    await createCategories();
+    await createMovies();
+    await createCinemas();
+    console.log("Seeding completed successfully.");
+  } catch (error) {
+    console.error("Error during seeding:", error);
+    process.exit(1);
+  }
 }
 
 main()

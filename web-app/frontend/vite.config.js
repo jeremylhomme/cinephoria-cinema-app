@@ -8,11 +8,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     build: {
-      outDir: "../dist",
+      outDir: "dist",
       emptyOutDir: true,
-      sourcemap: true,
     },
     base: "/",
+    publicDir: "public",
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "src"),
