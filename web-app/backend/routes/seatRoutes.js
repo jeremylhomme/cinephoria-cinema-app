@@ -8,6 +8,7 @@ import {
 } from "../controllers/seatController.js";
 import {
   authenticatedUser,
+  authorizedAdmin,
   authorizedEmployee,
 } from "../middlewares/authMiddleware.js";
 
@@ -17,7 +18,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // Create a new seat
-router.post("/", authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
+router.post("/", authenticatedUser, authorizedAdmin, (req, res) =>
   createSeat(req, res, prisma)
 );
 

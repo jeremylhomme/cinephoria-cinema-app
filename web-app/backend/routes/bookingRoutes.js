@@ -9,7 +9,7 @@ import {
 } from "../controllers/bookingController.js";
 import {
   authenticatedUser,
-  authorizedAdminOrSuperAdmin,
+  authorizedAdmin,
 } from "../middlewares/authMiddleware.js";
 import prisma from "../config/prismaClient.js";
 const router = express.Router();
@@ -29,7 +29,7 @@ router
 // Reset booking counts
 router
   .route("/reset-counts")
-  .put(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
+  .put(authenticatedUser, authorizedAdmin, (req, res) =>
     resetBookingCounts(req, res, prisma)
   );
 
@@ -46,7 +46,7 @@ router
 // Delete a booking (for admins)
 router
   .route("/:id")
-  .delete(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
+  .delete(authenticatedUser, authorizedAdmin, (req, res) =>
     deleteBooking(req, res, prisma)
   );
 

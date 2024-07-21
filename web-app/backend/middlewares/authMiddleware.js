@@ -72,22 +72,9 @@ const authorizedSuperAdmin = (req, res, next) => {
   }
 };
 
-const authorizedAdminOrSuperAdmin = (req, res, next) => {
-  if (
-    req.user &&
-    (req.user.userRole === "admin" || req.user.userRole === "superadmin")
-  ) {
-    next();
-  } else {
-    res.status(403);
-    throw new Error("Not authorized. Admin or Superadmin role required.");
-  }
-};
-
 export {
   authenticatedUser,
   authorizedAdmin,
   authorizedEmployee,
   authorizedSuperAdmin,
-  authorizedAdminOrSuperAdmin,
 };

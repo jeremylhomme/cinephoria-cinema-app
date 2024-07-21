@@ -9,7 +9,7 @@ import {
 
 import {
   authenticatedUser,
-  authorizedAdminOrSuperAdmin,
+  authorizedAdmin,
 } from "../middlewares/authMiddleware.js";
 
 import { PrismaClient } from "@prisma/client";
@@ -19,7 +19,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
+  .post(authenticatedUser, authorizedAdmin, (req, res) =>
     createCinema(req, res, prisma)
   );
 
@@ -28,10 +28,10 @@ router.get("/", (req, res) => getCinemas(req, res, prisma));
 router
   .route("/:id")
   .get((req, res) => getCinema(req, res, prisma))
-  .put(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
+  .put(authenticatedUser, authorizedAdmin, (req, res) =>
     updateCinema(req, res, prisma)
   )
-  .delete(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
+  .delete(authenticatedUser, authorizedAdmin, (req, res) =>
     deleteCinema(req, res, prisma)
   );
 
