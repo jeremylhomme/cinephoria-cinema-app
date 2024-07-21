@@ -7,6 +7,10 @@ services:
     startCommand: cd frontend && npm start
     envVars:
       - key: VITE_API_URL
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /frontend/index.html
 
   - type: web
     name: cinephoria-backend
