@@ -13,12 +13,6 @@ import app from "../setup";
 import prisma from "../../backend/config/prismaClient";
 import { sendEmail } from "../../backend/utils/sendEmail";
 import { hashPassword } from "../../backend/utils/userPasswordUtils";
-import {
-  authenticatedUser,
-  authorizedAdmin,
-  authorizedEmployee,
-  authorizedSuperAdmin,
-} from "../../backend/middlewares/authMiddleware";
 
 // Mock the sendEmail utility
 vi.mock("../../backend/utils/sendEmail", () => ({
@@ -41,14 +35,7 @@ vi.mock("../../backend/middlewares/authMiddleware", async (importOriginal) => {
           userFirstName: "Test",
           userLastName: "User",
           userEmail: "test@example.com",
-          userRole:
-            token === "ADMIN_TOKEN"
-              ? "admin"
-              : token === "SUPERADMIN_TOKEN"
-              ? "superadmin"
-              : token === "EMPLOYEE_TOKEN"
-              ? "employee"
-              : "customer",
+          userRole: token === "ADMIN_TOKEN" ? "admin" : "customer",
         };
         next();
       } else if (req.cookies.jwt) {
@@ -65,29 +52,10 @@ vi.mock("../../backend/middlewares/authMiddleware", async (importOriginal) => {
       }
     },
     authorizedAdmin: (req, res, next) => {
-      if (
-        req.user &&
-        (req.user.userRole === "admin" || req.user.userRole === "superadmin")
-      ) {
+      if (req.user && req.user.userRole === "admin") {
         next();
       } else {
         res.status(403).json({ error: "Not authorized as an admin" });
-      }
-    },
-    authorizedEmployee: (req, res, next) => {
-      if (["employee", "admin", "superadmin"].includes(req.user.userRole)) {
-        next();
-      } else {
-        res.status(403).json({
-          error: "Access denied. Employee, Admin, or Superadmin role required.",
-        });
-      }
-    },
-    authorizedSuperAdmin: (req, res, next) => {
-      if (req.user && req.user.userRole === "superadmin") {
-        next();
-      } else {
-        res.status(403).json({ error: "Not authorized as a superadmin" });
       }
     },
   };
@@ -198,95 +166,6 @@ describe("User Controller", () => {
         "error",
         "Not authorized, no token provided."
       );
-    });
-  });
-
-  describe("Role-based Access Control", () => {
-    // This test remains unchanged
-    it("should allow superadmin to access admin routes", async () => {
-      const response = await request(app)
-        .get("/api/users")
-        .set("Authorization", "Bearer SUPERADMIN_TOKEN");
-
-      expect(response.status).toBe(200);
-    });
-
-    // This test remains unchanged
-    it("should allow admin to access admin routes", async () => {
-      const response = await request(app)
-        .get("/api/users")
-        .set("Authorization", "Bearer ADMIN_TOKEN");
-
-      expect(response.status).toBe(200);
-    });
-
-    // This test remains unchanged
-    it("should not allow employee to access admin routes", async () => {
-      const response = await request(app)
-        .get("/api/users")
-        .set("Authorization", "Bearer EMPLOYEE_TOKEN");
-
-      expect(response.status).toBe(403);
-    });
-
-    // Update these tests to use the mock middleware directly
-    it("should allow superadmin to access employee routes", () => {
-      const req = { user: { userRole: "superadmin" } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      authorizedEmployee(req, res, next);
-
-      expect(next).toHaveBeenCalled();
-    });
-
-    it("should allow admin to access employee routes", () => {
-      const req = { user: { userRole: "admin" } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      authorizedEmployee(req, res, next);
-
-      expect(next).toHaveBeenCalled();
-    });
-
-    it("should allow employee to access employee routes", () => {
-      const req = { user: { userRole: "employee" } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      authorizedEmployee(req, res, next);
-
-      expect(next).toHaveBeenCalled();
-    });
-
-    it("should not allow customer to access employee routes", () => {
-      const req = { user: { userRole: "customer" } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      authorizedEmployee(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith({
-        error: "Access denied. Employee, Admin, or Superadmin role required.",
-      });
-    });
-
-    it("should allow only superadmin to access superadmin routes", () => {
-      const reqSuperadmin = { user: { userRole: "superadmin" } };
-      const reqAdmin = { user: { userRole: "admin" } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      authorizedSuperAdmin(reqSuperadmin, res, next);
-      expect(next).toHaveBeenCalled();
-
-      authorizedSuperAdmin(reqAdmin, res, next);
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith({
-        error: "Not authorized as a superadmin",
-      });
     });
   });
 
