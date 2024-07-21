@@ -9,7 +9,7 @@ import {
 } from "../controllers/bookingController.js";
 import {
   authenticatedUser,
-  authorizedAdmin,
+  authorizedAdminOrSuperAdmin,
 } from "../middlewares/authMiddleware.js";
 import prisma from "../config/prismaClient.js";
 const router = express.Router();
