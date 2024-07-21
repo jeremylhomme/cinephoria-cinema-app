@@ -5,7 +5,10 @@ import { useSelector } from "react-redux";
 const AdminRoute = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
-  return userInfo && userInfo.userRole === "admin" ? <Outlet /> : null;
+  return (userInfo && userInfo.userRole === "admin") ||
+    userInfo.userRole === "superadmin" ? (
+    <Outlet />
+  ) : null;
 };
 
 export default AdminRoute;

@@ -16,6 +16,8 @@ const Header = () => {
         <EmployeeMenu />
       ) : userInfo?.userRole === "customer" ? (
         <UserMenu />
+      ) : userInfo?.userRole === "superadmin" ? (
+        <AdminMenu />
       ) : (
         <VisitorMenu />
       )}
