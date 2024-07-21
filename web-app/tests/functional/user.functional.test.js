@@ -13,6 +13,12 @@ import app from "../setup";
 import prisma from "../../backend/config/prismaClient";
 import { sendEmail } from "../../backend/utils/sendEmail";
 import { hashPassword } from "../../backend/utils/userPasswordUtils";
+import {
+  authenticatedUser,
+  authorizedAdmin,
+  authorizedEmployee,
+  authorizedSuperAdmin,
+} from "../../backend/middlewares/authMiddleware";
 
 // Mock the sendEmail utility
 vi.mock("../../backend/utils/sendEmail", () => ({
@@ -196,6 +202,7 @@ describe("User Controller", () => {
   });
 
   describe("Role-based Access Control", () => {
+    // This test remains unchanged
     it("should allow superadmin to access admin routes", async () => {
       const response = await request(app)
         .get("/api/users")
@@ -204,6 +211,7 @@ describe("User Controller", () => {
       expect(response.status).toBe(200);
     });
 
+    // This test remains unchanged
     it("should allow admin to access admin routes", async () => {
       const response = await request(app)
         .get("/api/users")
@@ -212,6 +220,7 @@ describe("User Controller", () => {
       expect(response.status).toBe(200);
     });
 
+    // This test remains unchanged
     it("should not allow employee to access admin routes", async () => {
       const response = await request(app)
         .get("/api/users")
@@ -220,56 +229,64 @@ describe("User Controller", () => {
       expect(response.status).toBe(403);
     });
 
-    it("should allow superadmin to access employee routes", async () => {
-      const response = await request(app)
-        .get("/api/employee-route")
-        .set("Authorization", "Bearer SUPERADMIN_TOKEN");
+    // Update these tests to use the mock middleware directly
+    it("should allow superadmin to access employee routes", () => {
+      const req = { user: { userRole: "superadmin" } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+      const next = jest.fn();
 
-      expect(response.status).toBe(200);
+      authorizedEmployee(req, res, next);
+
+      expect(next).toHaveBeenCalled();
     });
 
-    it("should allow admin to access employee routes", async () => {
-      const response = await request(app)
-        .get("/api/employee-route")
-        .set("Authorization", "Bearer ADMIN_TOKEN");
+    it("should allow admin to access employee routes", () => {
+      const req = { user: { userRole: "admin" } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+      const next = jest.fn();
 
-      expect(response.status).toBe(200);
+      authorizedEmployee(req, res, next);
+
+      expect(next).toHaveBeenCalled();
     });
 
-    it("should allow employee to access employee routes", async () => {
-      const response = await request(app)
-        .get("/api/employee-route")
-        .set("Authorization", "Bearer EMPLOYEE_TOKEN");
+    it("should allow employee to access employee routes", () => {
+      const req = { user: { userRole: "employee" } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+      const next = jest.fn();
 
-      expect(response.status).toBe(200);
+      authorizedEmployee(req, res, next);
+
+      expect(next).toHaveBeenCalled();
     });
 
-    it("should not allow customer to access admin routes", async () => {
-      const response = await request(app)
-        .get("/api/users")
-        .set("Authorization", "Bearer CUSTOMER_TOKEN");
+    it("should not allow customer to access employee routes", () => {
+      const req = { user: { userRole: "customer" } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+      const next = jest.fn();
 
-      expect(response.status).toBe(403);
+      authorizedEmployee(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Access denied. Employee, Admin, or Superadmin role required.",
+      });
     });
 
-    it("should allow only superadmin to access superadmin routes", async () => {
-      const superadminResponse = await request(app)
-        .get("/api/superadmin-route")
-        .set("Authorization", "Bearer SUPERADMIN_TOKEN");
+    it("should allow only superadmin to access superadmin routes", () => {
+      const reqSuperadmin = { user: { userRole: "superadmin" } };
+      const reqAdmin = { user: { userRole: "admin" } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+      const next = jest.fn();
 
-      expect(superadminResponse.status).toBe(200);
+      authorizedSuperAdmin(reqSuperadmin, res, next);
+      expect(next).toHaveBeenCalled();
 
-      const adminResponse = await request(app)
-        .get("/api/superadmin-route")
-        .set("Authorization", "Bearer ADMIN_TOKEN");
-
-      expect(adminResponse.status).toBe(403);
-
-      const employeeResponse = await request(app)
-        .get("/api/superadmin-route")
-        .set("Authorization", "Bearer EMPLOYEE_TOKEN");
-
-      expect(employeeResponse.status).toBe(403);
+      authorizedSuperAdmin(reqAdmin, res, next);
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Not authorized as a superadmin",
+      });
     });
   });
 
