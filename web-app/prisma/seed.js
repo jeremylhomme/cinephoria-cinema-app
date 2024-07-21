@@ -21,7 +21,7 @@ async function createAdminUser() {
   const userLastName = process.env.ADMIN_LAST_NAME;
   const userEmail = process.env.ADMIN_EMAIL;
   const userUserName = process.env.ADMIN_USERNAME;
-  const userRole = "admin";
+  const userRole = "superadmin";
 
   try {
     const adminExists = await prisma.user.findFirst({

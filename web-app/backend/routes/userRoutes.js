@@ -21,7 +21,7 @@ import {
 } from "../controllers/userController.js";
 import {
   authenticatedUser,
-  authorizedAdmin,
+  authorizedAdminOrSuperAdmin,
 } from "../middlewares/authMiddleware.js";
 import prisma from "../config/prismaClient.js";
 
@@ -64,24 +64,24 @@ router
 // Routes for admins
 router
   .route("/")
-  .post(authenticatedUser, authorizedAdmin, (req, res) =>
+  .post(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
     createUser(req, res, prisma)
   )
-  .get(authenticatedUser, authorizedAdmin, (req, res) =>
+  .get(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
     getUsers(req, res, prisma)
   );
 router
   .route("/:id")
-  .put(authenticatedUser, authorizedAdmin, (req, res) =>
+  .put(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
     updateUser(req, res, prisma)
   )
-  .delete(authenticatedUser, authorizedAdmin, (req, res) =>
+  .delete(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
     deleteUser(req, res, prisma)
   );
 
 router
   .route("/user-details/:id")
-  .get(authenticatedUser, authorizedAdmin, (req, res) =>
+  .get(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
     getUserDetails(req, res, prisma)
   );
 

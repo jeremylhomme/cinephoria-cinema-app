@@ -129,6 +129,11 @@ const UserList = () => {
   const deleteHandler = async (id) => {
     const userToDelete = users.find((user) => user.id === id);
 
+    if (userToDelete.userRole === "superadmin") {
+      toast.error("Impossible de supprimer un superadmin.");
+      return;
+    }
+
     if (userToDelete.userRole === "admin" && adminCount <= 1) {
       toast.error("Impossible de supprimer le dernier administrateur.");
       return;
@@ -138,7 +143,7 @@ const UserList = () => {
       try {
         const userId = Number(id);
         if (isNaN(userId)) {
-          toast.error("Invalid ID: Deletion not performed.");
+          toast.error("ID invalide : Suppression non effectuée.");
           return;
         }
         await deleteUser(userId).unwrap();
@@ -148,10 +153,17 @@ const UserList = () => {
         refetch();
         toast.success("Utilisateur supprimé avec succès !");
       } catch (err) {
-        toast.error(
-          "Échec de la suppression de l'utilisateur. Veuillez réessayer."
-        );
-        console.error("Deletion error:", err);
+        if (
+          err.status === 403 &&
+          err.data?.message === "Superadmin cannot be deleted"
+        ) {
+          toast.error("Impossible de supprimer un superadmin.");
+        } else {
+          toast.error(
+            "Échec de la suppression de l'utilisateur. Veuillez réessayer."
+          );
+          console.error("Deletion error:", err);
+        }
       }
     }
   };
@@ -421,30 +433,33 @@ const UserList = () => {
                                     >
                                       <EyeIcon className="h-5 w-5" />
                                     </NavLink>
-                                    {user.userRole !== "customer" && (
+                                    {user.userRole !== "customer" &&
+                                      user.userRole !== "superadmin" && (
+                                        <button
+                                          onClick={() =>
+                                            toggleEdit(
+                                              user.id,
+                                              user.userFirstName,
+                                              user.userLastName,
+                                              user.userEmail,
+                                              user.userRole
+                                            )
+                                          }
+                                          className="text-gray-500 hover:text-gray-400"
+                                          data-testid="PencilSquareIcon"
+                                        >
+                                          <PencilSquareIcon className="h-5 w-5" />
+                                        </button>
+                                      )}
+                                    {user.userRole !== "superadmin" && (
                                       <button
-                                        onClick={() =>
-                                          toggleEdit(
-                                            user.id,
-                                            user.userFirstName,
-                                            user.userLastName,
-                                            user.userEmail,
-                                            user.userRole
-                                          )
-                                        }
+                                        onClick={() => deleteHandler(user.id)}
                                         className="text-gray-500 hover:text-gray-400"
-                                        data-testid="PencilSquareIcon"
+                                        data-testid="TrashIcon"
                                       >
-                                        <PencilSquareIcon className="h-5 w-5" />
+                                        <TrashIcon className="h-5 w-5" />
                                       </button>
                                     )}
-                                    <button
-                                      onClick={() => deleteHandler(user.id)}
-                                      className="text-gray-500 hover:text-gray-400"
-                                      data-testid="TrashIcon"
-                                    >
-                                      <TrashIcon className="h-5 w-5" />
-                                    </button>
                                   </div>
                                 )}
                               </td>

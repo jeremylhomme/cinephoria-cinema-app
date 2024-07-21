@@ -29,7 +29,7 @@ router
 // Reset booking counts
 router
   .route("/reset-counts")
-  .put(authenticatedUser, authorizedAdmin, (req, res) =>
+  .put(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
     resetBookingCounts(req, res, prisma)
   );
 
@@ -46,7 +46,7 @@ router
 // Delete a booking (for admins)
 router
   .route("/:id")
-  .delete(authenticatedUser, authorizedAdmin, (req, res) =>
+  .delete(authenticatedUser, authorizedAdminOrSuperAdmin, (req, res) =>
     deleteBooking(req, res, prisma)
   );
 
