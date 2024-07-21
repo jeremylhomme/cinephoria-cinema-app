@@ -34,6 +34,9 @@
     "update-db:dev": "node prisma/updateDBDev.js",
     "start": "node backend/server.js"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "keywords": [],
   "author": "Jeremy Lhomme",
   "license": "ISC",

@@ -15,6 +15,7 @@ vi.mock("../../backend/config/prismaClient", () => ({
   default: {
     user: {
       delete: vi.fn(),
+      findUnique: vi.fn(),
     },
   },
 }));
@@ -42,6 +43,9 @@ describe("deleteUser Controller", () => {
   });
 
   it("should delete a user successfully", async () => {
+    prismaModule.default.user.findUnique.mockResolvedValue({
+      userRole: "customer",
+    });
     prismaModule.default.user.delete.mockResolvedValue();
 
     await deleteUser(mockReq, mockRes);
@@ -65,10 +69,39 @@ describe("deleteUser Controller", () => {
     });
   });
 
-  it("should return 500 for server errors", async () => {
-    const error = new Error("Server error");
+  it("should return 403 when trying to delete a superadmin", async () => {
+    prismaModule.default.user.findUnique.mockResolvedValue({
+      userRole: "superadmin",
+    });
 
-    prismaModule.default.user.delete.mockRejectedValue(error);
+    await deleteUser(mockReq, mockRes);
+
+    expect(mockRes.status).toHaveBeenCalledWith(403);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      message: "Superadmin cannot be deleted",
+    });
+    expect(prismaModule.default.user.delete).not.toHaveBeenCalled();
+  });
+
+  it("should return 404 if user not found", async () => {
+    prismaModule.default.user.findUnique.mockResolvedValue(null);
+
+    await deleteUser(mockReq, mockRes);
+
+    expect(mockRes.status).toHaveBeenCalledWith(404);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      message: "User not found",
+    });
+    expect(prismaModule.default.user.delete).not.toHaveBeenCalled();
+  });
+
+  it("should return 500 for server errors", async () => {
+    prismaModule.default.user.findUnique.mockResolvedValue({
+      userRole: "customer",
+    });
+    prismaModule.default.user.delete.mockRejectedValue(
+      new Error("Server error")
+    );
 
     await deleteUser(mockReq, mockRes);
 

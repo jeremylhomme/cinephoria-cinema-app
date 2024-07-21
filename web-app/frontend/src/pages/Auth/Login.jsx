@@ -26,6 +26,7 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setMessage("");
     try {
       const response = await login({ userEmail, userPassword }).unwrap();
 
@@ -46,14 +47,16 @@ const Login = () => {
         }, 100);
       }
     } catch (error) {
-      if (!error.response) {
+      if (error.status === 401) {
+        setMessage("Mot de passe incorrect, veuillez réessayer.");
+      } else if (!error.response) {
         setMessage("Erreur de réseau. Veuillez vérifier votre connexion.");
-      } else if (error.response.status === 401) {
-        setMessage("Adresse e-mail ou mot de passe invalide.");
       } else {
         setMessage(error.data?.message || "Erreur de connexion");
       }
       console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
