@@ -4,7 +4,7 @@ import prisma from "../config/prismaClient.js";
 
 const getTokenFromRequest = (req) => {
   const bearerToken = req.headers.authorization;
-  const token = bearerToken && bearerToken.split(" ")[1]; // Authorization: Bearer TOKEN
+  const token = bearerToken && bearerToken.split(" ")[1];
   return token || req.cookies.jwt;
 };
 
@@ -42,7 +42,10 @@ const authenticatedUser = asyncHandler(async (req, res, next) => {
 });
 
 const authorizedAdmin = (req, res, next) => {
-  if (req.user && req.user.userRole === "admin") {
+  if (
+    req.user &&
+    (req.user.userRole === "admin" || req.user.userRole === "superadmin")
+  ) {
     next();
   } else {
     res.status(403);
@@ -51,12 +54,27 @@ const authorizedAdmin = (req, res, next) => {
 };
 
 const authorizedEmployee = (req, res, next) => {
-  if (req.user.userRole !== "employee" && req.user.userRole !== "admin") {
-    return res
-      .status(403)
-      .json({ error: "Access denied. Employee or Admin role required." });
+  if (["employee", "admin", "superadmin"].includes(req.user.userRole)) {
+    next();
+  } else {
+    return res.status(403).json({
+      error: "Access denied. Employee, Admin, or Superadmin role required.",
+    });
   }
-  next();
 };
 
-export { authenticatedUser, authorizedAdmin, authorizedEmployee };
+const authorizedSuperAdmin = (req, res, next) => {
+  if (req.user && req.user.userRole === "superadmin") {
+    next();
+  } else {
+    res.status(403);
+    throw new Error("Not authorized as a superadmin");
+  }
+};
+
+export {
+  authenticatedUser,
+  authorizedAdmin,
+  authorizedEmployee,
+  authorizedSuperAdmin,
+};
