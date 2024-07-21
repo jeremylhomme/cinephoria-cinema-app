@@ -8,13 +8,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     build: {
-      outDir: "../dist", // Output to the parent directory
-      assetsDir: "assets",
+      outDir: "../dist",
       emptyOutDir: true,
       sourcemap: true,
     },
-    publicDir: "public",
-    base: "/", // This ensures assets are loaded correctly from the root
+    base: "/",
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "src"),
@@ -25,21 +23,14 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5173,
-      strictPort: true,
-      host: true, // This allows the server to be accessible externally
-    },
-    preview: {
-      port: 5173,
-      strictPort: true,
       host: true,
-    },
-    optimizeDeps: {
-      include: ["react-router-dom"],
-    },
-    esbuild: {
-      loader: "jsx",
-      include: /src\/.*\.jsx?$/,
-      exclude: [],
+      proxy: {
+        "/api": {
+          target: env.VITE_API_URL || "http://localhost:5000",
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
   };
 });
