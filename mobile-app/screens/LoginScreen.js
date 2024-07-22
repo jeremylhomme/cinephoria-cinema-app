@@ -96,7 +96,7 @@ const LoginScreen = () => {
           disabled={isLoading}
         >
           <Text style={styles.buttonText}>
-            {isLoading ? "Loading..." : "Connexion"}
+            {isLoading ? "Chagement..." : "Connexion"}
           </Text>
         </TouchableOpacity>
       </View>

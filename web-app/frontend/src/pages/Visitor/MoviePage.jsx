@@ -639,11 +639,18 @@ const MoviePage = () => {
           )}
 
           {!userInfo && (
-            <Link to={`/login?redirect=${location.pathname}${location.search}`}>
-              <p className="py-2.5 px-3 underline inline-flex items-center rounded-md text-xs font-medium bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20">
-                Connectez-vous ou créez un compte pour réserver vos places.
+            <div className="text-center">
+              <p className="text-gray-500 mb-6">
+                Veuillez vous connecter pour sélectionner vos places et
+                réserver.
               </p>
-            </Link>
+              <Link
+                to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
+                className="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded"
+              >
+                Se connecter
+              </Link>
+            </div>
           )}
         </div>
 

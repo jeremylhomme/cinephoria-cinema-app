@@ -25,7 +25,7 @@ const LoginScreen = () => {
         const response = await login({ userEmail, userPassword }).unwrap();
 
         // Check if the user is an employee
-        if (response.userRole !== "employee") {
+        if (response.userRole === "customer") {
           setMessage("Access denied. Only employees can use this application.");
           setIsLoading(false);
           return;

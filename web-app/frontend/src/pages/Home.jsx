@@ -318,44 +318,48 @@ const Home = () => {
               {nowShowingMovies.length === 0 ? (
                 <p>Aucun film à l'affiche pour le moment.</p>
               ) : (
-                <div className="border-t pt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                <div className="pb-16 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 xl:gap-x-8">
                   {nowShowingMovies.map((movie) => (
                     <Link
                       key={movie.id}
                       to={`/movies/${movie.id}`}
                       className="group"
                     >
-                      <div className="bg-white p-8 xl:p-10 rounded-md shadow-sm">
+                      <div className="relative overflow-hidden rounded-lg">
                         <img
-                          src={movie.movieImg}
+                          src={`${movie.movieImg}`}
                           alt={movie.movieTitle}
-                          className="w-full object-cover rounded-lg mb-4"
+                          className="w-full h-auto object-cover group-hover:opacity-75"
+                          style={{ maxHeight: "400px" }}
                         />
-                        {movie.movieFavorite && (
-                          <span className="w-fit py-1.5 px-2 mt-4 inline-flex items-center font-semibold text-white rounded-md text-xs bg-red-700">
-                            Coup de coeur
-                          </span>
-                        )}
-                        <h3 className="text-base font-semibold text-gray-900">
-                          {movie.movieTitle}
-                        </h3>
-                        <p className="text-gray-400 mb-4">
-                          {movie.categories
-                            .map((category) => category.categoryName)
-                            .join(", ")}
-                        </p>
-                        {movie.sessions && movie.sessions.length > 0 ? (
-                          <p className="text-gray-500">
-                            {`Prochaines séances : ${formatSessionDates(
-                              movie.sessions
-                            )}`}
-                          </p>
-                        ) : (
-                          <p className="text-gray-500">
-                            Aucune séance disponible
-                          </p>
-                        )}
                       </div>
+                      {movie.movieFavorite && (
+                        <span className="w-fit py-1 px-2 mt-4 inline-flex items-center font-semibold text-white rounded-md text-xs bg-red-700">
+                          Coup de coeur
+                        </span>
+                      )}
+                      <p className="mt-1 text-sm text-gray-500">
+                        {movie.movieMinimumAge} ans et +
+                      </p>
+                      <h3 className="mt-2 text-base font-medium text-gray-900">
+                        {movie.movieTitle}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {movie.categories
+                          .map((cat) => cat.categoryName)
+                          .join(", ")}
+                      </p>
+                      {movie.sessions && movie.sessions.length > 0 ? (
+                        <p className="mt-1 text-sm text-gray-500">
+                          {`Prochaines séances : ${formatSessionDates(
+                            movie.sessions
+                          )}`}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-sm text-gray-500">
+                          Aucune séance disponible
+                        </p>
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -365,44 +369,48 @@ const Home = () => {
               {premiereMovies.length === 0 ? (
                 <p>Aucune avant-première pour le moment.</p>
               ) : (
-                <div className="border-t pt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="pb-16 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
                   {premiereMovies.map((movie) => (
                     <Link
                       key={movie.id}
                       to={`/movies/${movie.id}`}
                       className="group"
                     >
-                      <div className="bg-white p-8 xl:p-10 rounded-md shadow-sm">
+                      <div className="relative overflow-hidden rounded-lg">
                         <img
-                          src={movie.movieImg}
+                          src={`${movie.movieImg}`}
                           alt={movie.movieTitle}
-                          className="w-full object-cover rounded-lg mb-4"
+                          className="w-full h-auto object-cover group-hover:opacity-75"
+                          style={{ maxHeight: "400px" }}
                         />
-                        {movie.movieFavorite && (
-                          <span className="w-fit py-1.5 px-2 mt-4 inline-flex items-center font-semibold text-white rounded-md text-xs bg-red-700">
-                            Coup de coeur
-                          </span>
-                        )}
-                        <h3 className="text-base font-semibold text-gray-900">
-                          {movie.movieTitle}
-                        </h3>
-                        <p className="text-gray-400 mb-4">
-                          {movie.categories
-                            .map((category) => category.categoryName)
-                            .join(", ")}
-                        </p>
-                        {movie.sessions && movie.sessions.length > 0 ? (
-                          <p className="text-gray-500">
-                            {`Prochaines séances : ${formatSessionDates(
-                              movie.sessions
-                            )}`}
-                          </p>
-                        ) : (
-                          <p className="text-gray-500">
-                            Aucune séance disponible
-                          </p>
-                        )}
                       </div>
+                      {movie.movieFavorite && (
+                        <span className="w-fit py-1 px-2 mt-4 inline-flex items-center font-semibold text-white rounded-md text-xs bg-red-700">
+                          Coup de coeur
+                        </span>
+                      )}
+                      <p className="mt-1 text-sm text-gray-500">
+                        {movie.movieMinimumAge} ans et +
+                      </p>
+                      <h3 className="mt-2 text-base font-medium text-gray-900">
+                        {movie.movieTitle}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {movie.categories
+                          .map((cat) => cat.categoryName)
+                          .join(", ")}
+                      </p>
+                      {movie.sessions && movie.sessions.length > 0 ? (
+                        <p className="mt-1 text-sm text-gray-500">
+                          {`Prochaines séances : ${formatSessionDates(
+                            movie.sessions
+                          )}`}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-sm text-gray-500">
+                          Aucune séance disponible
+                        </p>
+                      )}
                     </Link>
                   ))}
                 </div>
