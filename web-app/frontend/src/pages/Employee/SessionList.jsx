@@ -209,7 +209,14 @@ const SessionList = () => {
                                           : "bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20"
                                       }`}
                                     >
-                                      {getSessionStatus(session)}
+                                      {getSessionStatus(session) === "Ended" ? (
+                                        <span>Terminée</span>
+                                      ) : getSessionStatus(session) ===
+                                        "Deleted" ? (
+                                        <span>Supprimée</span>
+                                      ) : (
+                                        <span>En ligne</span>
+                                      )}
                                     </span>
                                   </td>
                                   {session.sessionStatus !== "deleted" && (

@@ -125,3 +125,11 @@ mobile-app/.ipr
 mobile-app/.iws
 mobile-app/idea/
 
+gestion-projet
+web-app/prisma/seedDev.js
+web-app/prisma/seedTest.js
+web-app/prisma/initMigrateDev.js
+web-app/prisma/initMigrateTest.js
+web-app/prisma/resetDBDev.js
+web-app/devScripts/localBackend.js
+

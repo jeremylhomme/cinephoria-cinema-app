@@ -147,12 +147,12 @@ const Orders = () => {
     if (confirmCancel) {
       try {
         await softDeleteBooking(bookingId).unwrap();
-        toast.success("Booking successfully canceled");
+        toast.success("Votre commande a été annulée.");
         refetch();
       } catch (error) {
         console.error("Error canceling booking:", error);
         toast.error(
-          "Error canceling booking: " + (error.data?.message || error.error)
+          "Une erreur s'est produite lors de l'annulation de la commande."
         );
       }
     }
