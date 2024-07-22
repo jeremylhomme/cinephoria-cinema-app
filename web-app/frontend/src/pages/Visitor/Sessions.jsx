@@ -500,13 +500,13 @@ const Sessions = () => {
                 .map((session) => (
                   <div
                     key={session.id}
-                    className="group grid grid-cols-1 md:grid-cols-4 gap-6 border p-8 mb-4 bg-white rounded-lg shadow-md"
+                    className="group grid grid-cols-1 md:grid-cols-4 gap-6 border p-8 mb-4 bg-white rounded-lg shadow-sm"
                   >
                     <div className="col-span-1">
                       <img
                         src={session.movie.movieImg}
                         alt={session.movie.movieTitle}
-                        className="w-full object-cover rounded-lg"
+                        className="w-full object-cover"
                       />
                     </div>
                     <div className="col-span-3">

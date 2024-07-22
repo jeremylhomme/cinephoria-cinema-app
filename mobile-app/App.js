@@ -6,7 +6,6 @@ import { PersistGate } from "redux-persist/integration/react";
 import store, { persistor } from "./redux/store";
 import LoginScreen from "./screens/LoginScreen";
 import OrdersScreen from "./screens/OrdersScreen";
-import WebViewScreen from "./screens/WebViewScreen";
 import Footer from "./components/Footer";
 import useAuth from "./hooks/useAuth";
 
@@ -24,7 +23,6 @@ const AppContent = () => {
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Orders" component={OrdersScreen} />
-        <Stack.Screen name="WebView" component={WebViewScreen} />
       </Stack.Navigator>
       {userInfo && <Footer />}
     </NavigationContainer>

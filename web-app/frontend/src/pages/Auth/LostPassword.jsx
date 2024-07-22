@@ -21,7 +21,7 @@ const LostPassword = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-1 flex-col px-6 py-12 lg:px-8">
+    <div className="flex min-h-full flex-1 flex-col px-6 py-24 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Réinitialisation du mot de passe
@@ -57,7 +57,9 @@ const LostPassword = () => {
               disabled={isLoading}
               className="block rounded-md px-3 py-2 text-center text-sm bg-green-700 text-white hover:bg-green-800"
             >
-              {isLoading ? "Envoi en cours..." : "Envoyer les instructions"}
+              {isLoading
+                ? "Envoi en cours..."
+                : "Envoyer les instructions par e-mail"}
             </button>
           </div>
         </form>
