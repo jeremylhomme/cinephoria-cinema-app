@@ -90,6 +90,7 @@ const corsOptions = {
   origin: [
     process.env.WEB_APP_FRONTEND_URL,
     "https://cinephoria-frontend.onrender.com",
+    "http://localhost:8081",
     "http://localhost:5173",
     "http://localhost:5174",
   ],

@@ -71,11 +71,11 @@ const ContactPage = () => {
           <div className="sm:col-span-2">
             <label
               htmlFor="userName"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-medium leading-6"
             >
               Nom d'utilisateur
             </label>
-            <div className="mt-2.5">
+            <div className="mt-2">
               <input
                 id="userName"
                 name="userName"
@@ -83,7 +83,8 @@ const ContactPage = () => {
                 autoComplete="given-name"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+                placeholder="Entrez votre nom d'utilisateur"
+                className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -91,11 +92,11 @@ const ContactPage = () => {
           <div className="sm:col-span-2">
             <label
               htmlFor="email"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-medium leading-6"
             >
               Email
             </label>
-            <div className="mt-2.5">
+            <div className="mt-2">
               <input
                 id="email"
                 name="email"
@@ -103,7 +104,8 @@ const ContactPage = () => {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+                placeholder="Entrez votre adresse e-mail"
+                className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -111,37 +113,38 @@ const ContactPage = () => {
           <div className="sm:col-span-2">
             <label
               htmlFor="subject"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-medium leading-6"
             >
               Sujet
             </label>
-            <div className="mt-2.5">
+            <div className="mt-2">
               <input
                 id="subject"
                 name="subject"
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+                placeholder="Entrez le sujet de votre message"
+                className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
           <div className="sm:col-span-2">
             <label
               htmlFor="message"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-medium leading-6"
             >
               Message
             </label>
-            <div className="mt-2.5">
+            <div className="mt-2">
               <textarea
                 id="message"
                 name="message"
                 rows={4}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-                defaultValue={""}
+                placeholder="Entrez votre message"
+                className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -187,7 +190,7 @@ const ContactPage = () => {
       <div className="border-t border-gray-300 mt-16 max-w-7xl mx-auto grid grid-cols-1 gap-x-8 gap-y-10 pt-16 lg:grid-cols-3">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-            Locations
+            Localisations
           </h2>
           <p className="mt-4 leading-7 text-gray-600">
             Retrouvez-nous dans les villes suivantes :
