@@ -4,7 +4,6 @@ import {
   generatePassword,
   generateVerificationCode,
 } from "../backend/utils/userPasswordUtils.js";
-import { sendEmail } from "../backend/utils/sendEmail.js";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -67,7 +66,7 @@ async function createSuperAdminUser() {
     });
 
     console.log("Super admin user created successfully.");
-    console.log("Password:", userPassword);
+    console.log("Super admin password:", userPassword);
     console.log("Super admin Details:", {
       id: newUser.id,
       userFirstName: newUser.userFirstName,
@@ -107,6 +106,9 @@ async function createAdminUser() {
       return;
     }
 
+    const verificationCode = generateVerificationCode();
+    const verificationCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
     const newUser = await prisma.user.create({
       data: {
         userFirstName,
@@ -125,7 +127,7 @@ async function createAdminUser() {
     });
 
     console.log("Admin user created successfully.");
-    console.log("Password:", userPassword);
+    console.log("Admin password:", userPassword);
     console.log("Admin Details:", {
       id: newUser.id,
       userFirstName: newUser.userFirstName,
@@ -165,6 +167,9 @@ async function createEmployeeUser() {
       return;
     }
 
+    const verificationCode = generateVerificationCode();
+    const verificationCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
     const newUser = await prisma.user.create({
       data: {
         userFirstName,
@@ -183,7 +188,7 @@ async function createEmployeeUser() {
     });
 
     console.log("Employee user created successfully.");
-    console.log("Password:", userPassword);
+    console.log("Employee password:", userPassword);
     console.log("Employee Details:", {
       id: newUser.id,
       userFirstName: newUser.userFirstName,
@@ -223,6 +228,9 @@ async function createCustomerUser() {
       return;
     }
 
+    const verificationCode = generateVerificationCode();
+    const verificationCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
     const newUser = await prisma.user.create({
       data: {
         userFirstName,
@@ -241,7 +249,7 @@ async function createCustomerUser() {
     });
 
     console.log("Customer user created successfully.");
-    console.log("Password:", userPassword);
+    console.log("Customer password:", userPassword);
     console.log("Customer Details:", {
       id: newUser.id,
       userFirstName: newUser.userFirstName,
@@ -456,6 +464,9 @@ async function createSessions() {
 async function main() {
   try {
     await createSuperAdminUser();
+    await createAdminUser();
+    await createEmployeeUser();
+    await createCustomerUser();
     await createCategories();
     await createMovies();
     await createCinemas();
