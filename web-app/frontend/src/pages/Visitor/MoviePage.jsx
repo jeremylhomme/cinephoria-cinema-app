@@ -120,8 +120,10 @@ const MoviePage = () => {
       roomCapacity: session.room.roomCapacity,
     });
 
-    // Refetch session details to get updated seat information
-    await refetchSessionDetails();
+    // Only refetch if selectedTimeRange is set
+    if (selectedTimeRange) {
+      await refetchSessionDetails();
+    }
   };
 
   const handleSeatSelect = (seat) => {

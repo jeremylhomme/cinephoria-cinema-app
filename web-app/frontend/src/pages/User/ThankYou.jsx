@@ -71,7 +71,9 @@ const ThankYou = () => {
 
             <dl className="mt-4 font-medium">
               <dt className="text-gray-900">N° de commande :</dt>
-              <dd className="mt-2 text-indigo-600">{booking._id}</dd>
+              <dd className="mt-2 text-green-700 font-semibold">
+                {booking._id}
+              </dd>
             </dl>
 
             <ul
@@ -97,9 +99,17 @@ const ThankYou = () => {
                       )}
                     </span>
                   </p>
-                  <p className="text-sm">{`Seats: ${booking.seatsBooked
-                    .map((seat) => seat.seatNumber)
-                    .join(", ")}`}</p>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Numéros des places :{" "}
+                    {booking.seatsBooked.map((seat) => (
+                      <span
+                        key={seat.seatNumber}
+                        className="mr-2 bg-gray-100 rounded-md p-1"
+                      >
+                        {seat.seatNumber}
+                      </span>
+                    ))}
+                  </p>
                 </div>
               </li>
             </ul>

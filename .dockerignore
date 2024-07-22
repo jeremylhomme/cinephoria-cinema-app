@@ -55,3 +55,8 @@ web-app/cypress/videos/
 
 # Exclude desktop build files
 desktop-app/.vite/build
+
+gestion-projet
+
+web-app/prisma/seedDev.js
+web-app/prisma/seedTest.js

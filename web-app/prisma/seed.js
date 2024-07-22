@@ -30,7 +30,7 @@ async function createAdminUser() {
   try {
     const adminExists = await prisma.user.findFirst({
       where: {
-        userRole: "admin",
+        userRole: "admin" || "superadmin",
       },
     });
 
@@ -176,12 +176,118 @@ async function createCinemas() {
   }
 }
 
+async function createRooms() {
+  const roomsData = JSON.parse(
+    await fs.readFile(path.join(dataPath, "roomData.json"), "utf8")
+  );
+
+  for (const room of roomsData) {
+    const existingRoom = await prisma.room.findFirst({
+      where: {
+        cinemaId: room.cinemaId,
+        roomNumber: room.roomNumber,
+      },
+    });
+
+    if (!existingRoom) {
+      const createdRoom = await prisma.room.create({
+        data: room,
+      });
+      console.log(
+        `Created room number ${createdRoom.roomNumber} in cinema ID ${createdRoom.cinemaId}`
+      );
+    } else {
+      console.log(
+        `Room number ${room.roomNumber} in cinema ID ${room.cinemaId} already exists`
+      );
+    }
+  }
+}
+
+async function createSessions() {
+  const sessionData = JSON.parse(
+    await fs.readFile(path.join(dataPath, "sessionData.json"), "utf8")
+  );
+
+  for (const session of sessionData) {
+    const sessionDateObj = new Date(session.sessionDate);
+    const sessionDateUTC = new Date(
+      Date.UTC(
+        sessionDateObj.getUTCFullYear(),
+        sessionDateObj.getUTCMonth(),
+        sessionDateObj.getUTCDate()
+      )
+    );
+
+    const existingSession = await prisma.session.findFirst({
+      where: {
+        cinemaId: Number(session.cinemaId),
+        movieId: Number(session.movieId),
+        roomId: Number(session.roomId),
+        sessionDate: sessionDateUTC,
+      },
+    });
+
+    if (!existingSession) {
+      const createdSession = await prisma.session.create({
+        data: {
+          movie: { connect: { id: Number(session.movieId) } },
+          cinema: { connect: { id: Number(session.cinemaId) } },
+          room: { connect: { id: Number(session.roomId) } },
+          sessionDate: sessionDateUTC,
+          sessionPrice: session.sessionPrice,
+          sessionStatus: session.sessionStatus,
+          timeRanges: {
+            create: session.timeRanges.map((timeRange) => ({
+              timeRangeStartTime: new Date(timeRange.timeRangeStartTime),
+              timeRangeEndTime: new Date(timeRange.timeRangeEndTime),
+              timeRangeStatus: timeRange.timeRangeStatus || "available",
+            })),
+          },
+        },
+        include: {
+          movie: true,
+          cinema: true,
+          room: {
+            include: {
+              seats: true,
+            },
+          },
+          timeRanges: true,
+        },
+      });
+
+      const seatStatusPromises = createdSession.timeRanges.map((timeRange) =>
+        createdSession.room.seats.map((seat) =>
+          prisma.seatStatus.create({
+            data: {
+              seat: { connect: { id: seat.id } },
+              timeRange: { connect: { id: timeRange.id } },
+              status: "available",
+            },
+          })
+        )
+      );
+
+      await Promise.all(seatStatusPromises.flat());
+
+      console.log(`Created session with ID: ${createdSession.id}`);
+    } else {
+      console.log(
+        `Session already exists for cinema ID ${session.cinemaId}, movie ID ${session.movieId}, room ID ${session.roomId}, and date ${session.sessionDate}`
+      );
+    }
+  }
+}
+
 async function main() {
   try {
     await createAdminUser();
     await createCategories();
     await createMovies();
     await createCinemas();
+    await createRooms();
+    await createSessions();
     console.log("Seeding completed successfully.");
   } catch (error) {
     console.error("Error during seeding:", error);
