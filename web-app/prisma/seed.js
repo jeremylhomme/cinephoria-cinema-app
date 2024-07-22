@@ -17,9 +17,7 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL,
-      connectionLimit: 30,
-      poolTimeout: 20,
+      url: `${process.env.DATABASE_URL}?connection_limit=30&pool_timeout=20`,
     },
   },
 });
