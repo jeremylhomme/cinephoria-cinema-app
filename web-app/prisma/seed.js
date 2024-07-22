@@ -14,7 +14,15 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+      connectionLimit: 30,
+      poolTimeout: 20,
+    },
+  },
+});
 
 // Update the path to the data files
 const dataPath = path.resolve(__dirname, "../frontend/src/assets/data");
@@ -390,7 +398,16 @@ async function createSessions() {
     await fs.readFile(path.join(dataPath, "sessionData.json"), "utf8")
   );
 
-  for (const session of sessionData) {
+  // Process sessions in batches of 10
+  const batchSize = 10;
+  for (let i = 0; i < sessionData.length; i += batchSize) {
+    const batch = sessionData.slice(i, i + batchSize);
+    await processSessionBatch(batch);
+  }
+}
+
+async function processSessionBatch(sessionBatch) {
+  for (const session of sessionBatch) {
     const sessionDateObj = new Date(session.sessionDate);
     const sessionDateUTC = new Date(
       Date.UTC(
@@ -427,8 +444,6 @@ async function createSessions() {
           },
         },
         include: {
-          movie: true,
-          cinema: true,
           room: {
             include: {
               seats: true,
@@ -438,19 +453,20 @@ async function createSessions() {
         },
       });
 
-      const seatStatusPromises = createdSession.timeRanges.map((timeRange) =>
-        createdSession.room.seats.map((seat) =>
-          prisma.seatStatus.create({
-            data: {
-              seat: { connect: { id: seat.id } },
-              timeRange: { connect: { id: timeRange.id } },
-              status: "available",
-            },
-          })
-        )
+      // Prepare batch insert data for SeatStatus
+      const seatStatusData = createdSession.timeRanges.flatMap((timeRange) =>
+        createdSession.room.seats.map((seat) => ({
+          seatId: seat.id,
+          timeRangeId: timeRange.id,
+          status: "available",
+        }))
       );
 
-      await Promise.all(seatStatusPromises.flat());
+      // Batch insert SeatStatus records
+      await prisma.seatStatus.createMany({
+        data: seatStatusData,
+        skipDuplicates: true,
+      });
 
       console.log(`Created session with ID: ${createdSession.id}`);
     } else {
