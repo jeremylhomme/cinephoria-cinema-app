@@ -20,7 +20,7 @@ const prisma = new PrismaClient();
 // Update the path to the data files
 const dataPath = path.resolve(__dirname, "../frontend/src/assets/data");
 
-async function createAdminUser() {
+async function createSuperAdminUser() {
   const userFirstName = process.env.ADMIN_FIRST_NAME;
   const userLastName = process.env.ADMIN_LAST_NAME;
   const userEmail = process.env.ADMIN_EMAIL;
@@ -28,13 +28,13 @@ async function createAdminUser() {
   const userRole = "superadmin";
 
   try {
-    const adminExists = await prisma.user.findFirst({
+    const superAdminExists = await prisma.user.findFirst({
       where: {
-        userRole: "admin" || "superadmin",
+        userRole: "superadmin",
       },
     });
 
-    if (adminExists) {
+    if (superAdminExists) {
       console.log("An admin user already exists.");
       return;
     }
@@ -66,23 +66,66 @@ async function createAdminUser() {
       },
     });
 
-    const verificationLink = `${process.env.WEB_APP_FRONTEND_URL}verify-email?code=${verificationCode}`;
-    await sendEmail({
-      from: `Cinéphoria <bonjour@${process.env.MAILGUN_DOMAIN}>`,
-      to: userEmail,
-      subject: "Votre compte administrateur Cinéphoria",
-      template: "create_new_user",
-      variables: {
-        verificationLink,
-        userPassword,
+    console.log("Super admin user created successfully.");
+    console.log("Password:", userPassword);
+    console.log("Super admin Details:", {
+      id: newUser.id,
+      userFirstName: newUser.userFirstName,
+      userLastName: newUser.userLastName,
+      userUserName: newUser.userUserName,
+      userEmail: newUser.userEmail,
+      userRole: newUser.userRole,
+    });
+  } catch (error) {
+    console.error("Error creating super admin user:", error);
+  }
+}
+
+async function createAdminUser() {
+  const userFirstName = "Admin";
+  const userLastName = "Cinephoria";
+  const userEmail = "admin@change-email.com";
+  const userUserName = "admin";
+  const userRole = "admin";
+
+  try {
+    const adminExists = await prisma.user.findFirst({
+      where: {
+        userRole: "admin",
+      },
+    });
+
+    if (adminExists) {
+      console.log("An admin user already exists.");
+      return;
+    }
+
+    const userPassword = generatePassword();
+    const hashedPassword = await hashPassword(userPassword);
+    if (!hashedPassword) {
+      console.log("Failed to process userPassword, please try again.");
+      return;
+    }
+
+    const newUser = await prisma.user.create({
+      data: {
         userFirstName,
         userLastName,
         userUserName,
         userEmail,
+        userPassword: hashedPassword,
+        userRole,
+        mustChangePassword: true,
+        isVerified: true,
+        agreedPolicy: true,
+        agreedCgvCgu: true,
+        verificationCode,
+        verificationCodeExpires,
       },
     });
 
     console.log("Admin user created successfully.");
+    console.log("Password:", userPassword);
     console.log("Admin Details:", {
       id: newUser.id,
       userFirstName: newUser.userFirstName,
@@ -91,9 +134,124 @@ async function createAdminUser() {
       userEmail: newUser.userEmail,
       userRole: newUser.userRole,
     });
-    console.log("An email has been sent to the admin with login details.");
   } catch (error) {
     console.error("Error creating admin user:", error);
+  }
+}
+
+async function createEmployeeUser() {
+  const userFirstName = "Employee";
+  const userLastName = "Cinephoria";
+  const userEmail = "employee@change-email.com";
+  const userUserName = "employee";
+  const userRole = "employee";
+
+  try {
+    const employeeExists = await prisma.user.findFirst({
+      where: {
+        userRole: "employee",
+      },
+    });
+
+    if (employeeExists) {
+      console.log("An employee user already exists.");
+      return;
+    }
+
+    const userPassword = generatePassword();
+    const hashedPassword = await hashPassword(userPassword);
+    if (!hashedPassword) {
+      console.log("Failed to process userPassword, please try again.");
+      return;
+    }
+
+    const newUser = await prisma.user.create({
+      data: {
+        userFirstName,
+        userLastName,
+        userUserName,
+        userEmail,
+        userPassword: hashedPassword,
+        userRole,
+        mustChangePassword: true,
+        isVerified: true,
+        agreedPolicy: true,
+        agreedCgvCgu: true,
+        verificationCode,
+        verificationCodeExpires,
+      },
+    });
+
+    console.log("Employee user created successfully.");
+    console.log("Password:", userPassword);
+    console.log("Employee Details:", {
+      id: newUser.id,
+      userFirstName: newUser.userFirstName,
+      userLastName: newUser.userLastName,
+      userUserName: newUser.userUserName,
+      userEmail: newUser.userEmail,
+      userRole: newUser.userRole,
+    });
+  } catch (error) {
+    console.error("Error creating employee user:", error);
+  }
+}
+
+async function createCustomerUser() {
+  const userFirstName = "Customer";
+  const userLastName = "Cinephoria";
+  const userEmail = "customer@change-email.com";
+  const userUserName = "customer";
+  const userRole = "customer";
+
+  try {
+    const customerExists = await prisma.user.findFirst({
+      where: {
+        userRole: "customer",
+      },
+    });
+
+    if (customerExists) {
+      console.log("An customer user already exists.");
+      return;
+    }
+
+    const userPassword = generatePassword();
+    const hashedPassword = await hashPassword(userPassword);
+    if (!hashedPassword) {
+      console.log("Failed to process userPassword, please try again.");
+      return;
+    }
+
+    const newUser = await prisma.user.create({
+      data: {
+        userFirstName,
+        userLastName,
+        userUserName,
+        userEmail,
+        userPassword: hashedPassword,
+        userRole,
+        mustChangePassword: true,
+        isVerified: true,
+        agreedPolicy: true,
+        agreedCgvCgu: true,
+        verificationCode,
+        verificationCodeExpires,
+      },
+    });
+
+    console.log("Customer user created successfully.");
+    console.log("Password:", userPassword);
+    console.log("Customer Details:", {
+      id: newUser.id,
+      userFirstName: newUser.userFirstName,
+      userLastName: newUser.userLastName,
+      userUserName: newUser.userUserName,
+      userEmail: newUser.userEmail,
+      userRole: newUser.userRole,
+    });
+  } catch (error) {
+    console.error("Error creating customer user:", error);
   }
 }
 
@@ -297,7 +455,7 @@ async function createSessions() {
 
 async function main() {
   try {
-    await createAdminUser();
+    await createSuperAdminUser();
     await createCategories();
     await createMovies();
     await createCinemas();
