@@ -193,8 +193,23 @@ async function createRooms() {
       const createdRoom = await prisma.room.create({
         data: room,
       });
+
+      // Create seats for the room
+      const seatsToCreate = Array.from(
+        { length: room.roomCapacity },
+        (_, index) => ({
+          seatNumber: (index + 1).toString(),
+          roomId: createdRoom.id,
+          pmrSeat: false,
+        })
+      );
+
+      await prisma.seat.createMany({
+        data: seatsToCreate,
+      });
+
       console.log(
-        `Created room number ${createdRoom.roomNumber} in cinema ID ${createdRoom.cinemaId}`
+        `Created room number ${createdRoom.roomNumber} in cinema ID ${createdRoom.cinemaId} with ${room.roomCapacity} seats`
       );
     } else {
       console.log(
