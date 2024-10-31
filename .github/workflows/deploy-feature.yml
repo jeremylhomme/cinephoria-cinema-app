@@ -36,7 +36,7 @@ jobs:
           MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
           MAILGUN_CINEPHORIA_API_KEY: ${{ secrets.MAILGUN_CINEPHORIA_API_KEY }}
 
-      - name: Check for test files
+      - name: Check test files
         id: check_tests
         run: |
           if [ -n "$(find tests/unit -name '*.test.js' -or -name '*.spec.js')" ]; then
