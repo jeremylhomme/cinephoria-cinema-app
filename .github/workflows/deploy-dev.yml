@@ -57,14 +57,14 @@ jobs:
         working-directory: ./web-app
 
       - name: Apply Prisma Schema
-        run: docker-compose -f docker-compose-test.yml exec -T backend npx prisma db push --force-reset
+        run: docker compose -f docker-compose-test.yml exec -T backend npx prisma db push --force-reset
         working-directory: ./web-app
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run unit tests
         if: steps.check_tests.outputs.unit_tests == 'true'
-        run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:unit
+        run: docker compose -f docker-compose-test.yml exec -T backend npm run test:unit
         working-directory: ./web-app
         env:
           DATABASE_URL: mysql://root:${{ secrets.MYSQL_PASSWORD }}@mysql-db:3306/sql_cinephoria_dev
@@ -72,14 +72,14 @@ jobs:
 
       - name: Run functional tests
         if: steps.check_tests.outputs.functional_tests == 'true'
-        run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:functional
+        run: docker compose -f docker-compose-test.yml exec -T backend npm run test:functional
         working-directory: ./web-app
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Run integration tests
         if: steps.check_tests.outputs.integration_tests == 'true'
-        run: docker-compose -f docker-compose-test.yml exec -T backend npm run test:integration
+        run: docker compose -f docker-compose-test.yml exec -T backend npm run test:integration
         working-directory: ./web-app
         env:
           DATABASE_URL: mysql://root:${{ secrets.MYSQL_PASSWORD }}@mysql-db:3306/sql_cinephoria_dev
