@@ -7,7 +7,7 @@
   "scripts": {
     "backend": "node devScripts/localBackend.js",
     "backend:docker:test": "node devScripts/dockerBackendTest.js",
-    "docker:test": "docker-compose -f docker-compose-test.yml up -d --build",
+    "docker:test": "docker compose -f docker-compose-test.yml up -d --build",
     "frontend": "npm run dev --prefix frontend",
     "dev": "cross-env NODE_ENV=development concurrently \"npm run backend\" \"npm run frontend\"",
     "prod": "node backend/server.js",

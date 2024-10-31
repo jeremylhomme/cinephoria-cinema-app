@@ -13,7 +13,8 @@ const CinemaDetails = () => {
   const { data: cinema, isFetching, isError } = useGetCinemaDetailsQuery(id);
 
   if (isFetching) return <LoaderFull />;
-  if (isError) return <p>Erreur lors du chargement des détails du cinéma.</p>;
+  if (isError)
+    return <p>Erreur pendant du chargement des détails du cinéma.</p>;
 
   return (
     <div className="py-10">
